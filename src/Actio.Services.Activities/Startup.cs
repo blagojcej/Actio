@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Actio.Common.Commands;
+using Actio.Common.Mongo;
+using Actio.Common.RabbitMQ;
+using Actio.Services.Activities.Domain.Repositories;
+using Actio.Services.Activities.Handlers;
+using Actio.Services.Activities.Repositories;
+using Actio.Services.Activities.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Actio.Services.Activities
 {
@@ -25,6 +25,24 @@ namespace Actio.Services.Activities
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging();
+
+            services.AddMongoDB(Configuration);
+
+            services.AddRabbitMq(Configuration);
+
+            services.AddScoped<ICommandHandler<CreateActivityCommand>, CreateActivityHandler>();
+
+            //Register repositories
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
+
+            //Register MongoDB database seeder
+            services.AddScoped<IDatabaseSeeder, CustomMongoSeeder>();
+
+            //Register services
+            services.AddScoped<IActivityService, ActivityService>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -40,7 +58,16 @@ namespace Actio.Services.Activities
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var databaseInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
+
+                databaseInitializer.InitializeAsync();
+            }
+
+            //app.ApplicationServices.GetService<IDatabaseInitializer>().InitializeAsync();
+
+            //app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
