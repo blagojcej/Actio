@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Actio.API.Handlers;
+﻿using Actio.API.Handlers;
+using Actio.API.Repositories;
 using Actio.Common.Auth;
 using Actio.Common.Events;
+using Actio.Common.Mongo;
 using Actio.Common.RabbitMQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Actio.API
 {
@@ -31,9 +26,13 @@ namespace Actio.API
         {
             services.AddLogging();
             services.AddJwt(Configuration);
+            services.AddMongoDB(Configuration);
             services.AddRabbitMq(Configuration);
 
             services.AddScoped<IEventHandler<ActivityCreatedEvent>, ActivityCreatedHandler>();
+            services.AddScoped<IEventHandler<UserAuthenticatedEvent>, UserAuthenticatedHandler>();
+            services.AddScoped<IEventHandler<UserCreatedEvent>, UserCreatedHandler>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

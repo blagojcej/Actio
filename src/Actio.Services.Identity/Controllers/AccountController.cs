@@ -1,5 +1,6 @@
 ﻿using Actio.Common.Commands;
 using Actio.Services.Identity.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -17,6 +18,6 @@ namespace Actio.Services.Identity.Controllers
         }
 
         private async Task<IActionResult> Login([FromBody] AuthenticateUserCommand command)
-            =>  new JsonResult(await _userService.LoginAsync(command.Email, command.Password));
+            => new JsonResult(await _userService.LoginAsync(command.Email, command.Password));
     }
 }

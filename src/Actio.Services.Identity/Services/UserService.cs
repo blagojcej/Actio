@@ -7,6 +7,7 @@ using Actio.Common.Exceptions;
 using Actio.Services.Identity.Domain.Models;
 using Actio.Services.Identity.Domain.Repositories;
 using Actio.Services.Identity.Domain.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Actio.Services.Identity.Services
 {
