@@ -3,11 +3,10 @@
     public interface IEncrypter
     {
         /// <summary>
-        /// Get secured string for given value
+        /// Get secured string
         /// </summary>
-        /// <param name="value">Password</param>
         /// <returns></returns>
-        string GetSalt(string value);
+        string GetSalt();
 
         /// <summary>
         /// Get hash for given password and salt
